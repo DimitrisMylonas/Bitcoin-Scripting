@@ -1,0 +1,89 @@
+LockingScript:
+--------------
+Create 3 private keys in your regtest node and 3 public keys from them.
+Insert the values of those 3 public keys as the parameters values.
+
+$ python LockingScript.py --pubk1 (value) --pubk2 (value) --pubk3 (value)
+  
+ If the parameters' values are correct, the script will print the 3 public keys
+ and return a P2SH address.
+
+--------------------------------------------------------------------------------------------
+UnlockingScript:
+----------------
+Insert 2 out of 3 private keys from the ones used to produce the public keys in 
+LockingScript.py. Also, insert 1 out of 3 public keys (the one whose private key was not 
+selected before). The value of the p2sh parameter should be the value of the P2SH address returned
+by the LockingScript.py. Furthermore, you have to create a p2pkh address in your regtest 
+node and use its value for the p2pkh paremeter. Finally, use your bitcoind credentials' 
+values (rpcuser and rpcpassword) for user and password parameters.
+
+$ python UnlockingScript.py --priv1 (value) --priv2 (value) --pub (value)
+ --p2sh (value) --p2pkh (value) --user (value) --password (value)
+
+ If the parameters' values are correct, the script will return the appropriate message
+ depending on the moves that have been made -or not (e.g. The amount of total funds that can be 
+ spent, the total fees, if the transaction is valid, the unsigned and signed transaction).
+
+ *Make sure that your local regtest node is running.
+ *Make sure that you have sent some bitcoins to the p2sh address that you have created in
+  LockingScript.py (else an error message will occur - "No funds to move") and that the TXOs
+  have been mined in order to be visible from the script.
+
+ 
+--------------------------------------------------------------------------------------------
+At the beginning of each script some suggested parameters' values are given.
+Run the scripts and give the appropriate value to each parameter by copy and paste the 
+values given at the comments or create your values as described above.
+--------------------------------------------------------------------------------------------
+EXECUTION EXAMPLE: 
+------------------
+PS G:\My Drive\DWS\Decentralized-Technologies\Assignment 1\temp> python .\LockingScript.py --pubk1 03a0434d9e47f3c86235477c7b1ae6ae5d3442d49b1943c2b752a68e2a47e247c7 --pubk2 024ce119c96e2fa357200b559b2f7dd5a5f02d5290aff74b03f3e471b273211c97 --pubk3 036d2b085e9e382ed10b69fc311a03f8641ccfff21574de0927513a49d9a688a00
+
+
+ First public key: 03a0434d9e47f3c86235477c7b1ae6ae5d3442d49b1943c2b752a68e2a47e247c7
+
+ Second public key: 024ce119c96e2fa357200b559b2f7dd5a5f02d5290aff74b03f3e471b273211c97
+
+ Third public key: 036d2b085e9e382ed10b69fc311a03f8641ccfff21574de0927513a49d9a688a00
+
+ The P2SH address to send the funds is:  2ND4YNVfKRVf3QpwuRLQVucsCLBWNm42ZRE
+PS G:\My Drive\DWS\Decentralized-Technologies\Assignment 1\temp> bitcoin-cli createwallet wallet
+{
+  "name": "wallet",
+  "warning": "-fallbackfee is set very high! This is the transaction fee you may pay when fee estimates are not available.\n-maxtxfee is set very high! Fees this large could be paid on a single transaction."
+}
+PS G:\My Drive\DWS\Decentralized-Technologies\Assignment 1\temp> bitcoin-cli getnewaddress "dimitris"
+bcrt1qh7xw7p9ma7jrees4qxskq59m3nuzvszlv6sncp
+PS G:\My Drive\DWS\Decentralized-Technologies\Assignment 1\temp> bitcoin-cli generatetoaddress 101 bcrt1qh7xw7p9ma7jrees4qxskq59m3nuzvszlv6sncp >> out.txt
+PS G:\My Drive\DWS\Decentralized-Technologies\Assignment 1\temp> bitcoin-cli sendtoaddress 2ND4YNVfKRVf3QpwuRLQVucsCLBWNm42ZRE 20
+d9aa6acb70704ff63a6ea68b25e32edcc52db082961da3c83df915a2f556613a
+PS G:\My Drive\DWS\Decentralized-Technologies\Assignment 1\temp> python .\UnlockingScript.py --help
+Usage: UnlockingScript.py [OPTIONS]
+
+Options:
+  --pub TEXT       The (3rd) public key needed to create the redeem script
+  --priv1 TEXT     First private key for the P2PKH part
+  --priv2 TEXT     Second private key for the P2PKH part
+  --p2sh TEXT      The P2SH address to get the funds from
+  --p2pkh TEXT     The P2PKH address to send the funds to
+  --user TEXT      proxy username
+  --password TEXT  proxy password
+  --help           Show this message and exit.
+PS G:\My Drive\DWS\Decentralized-Technologies\Assignment 1\temp> python .\UnlockingScript.py --pub 036d2b085e9e382ed10b69fc311a03f8641ccfff21574de0927513a49d9a688a00 --priv1 cMahea7zqjxrtgAbB7LSGbcQUr1uX1ojuat9jZodMN87P6WEG9dX --priv2 cMahea7zqjxrtgAbB7LSGbcQUr1uX1ojuat9jZodMN87U5QCW9Uf --p2sh 2ND4YNVfKRVf3QpwuRLQVucsCLBWNm42ZRE --p2pkh mqvQa4TX6ZHeuagtLVBXezoUgB4Xs5pmaK --user dimitris --password pass123
+Total funds to move:  2000000000 (satoshis)
+fees: 13184 (satoshis)
+Transaction is valid!
+
+Raw unsigned transaction:
+02000000013a6156f5a215f93dc8a31d9682b02dc5dc2ee3258ba66e3af64f7070cb6aaad901000000fdfd0000483045022100e53cb5934eb54e3c3ca261f9d89083bf85d20dda8c99c0a516ab113e15503520022049f5f7de7a05fe24528802e5b6e9343dad0869eefdf11a0030fe3fb09b239a0001473044022043a5dce54f96068b9493ed71931606aa71e4fd9ce9778807043ee3d515de1db20220302378ef0570574988688a01f611d993032b5e3754a09fe70862df79eec4b191014c69522103a0434d9e47f3c86235477c7b1ae6ae5d3442d49b1943c2b752a68e2a47e247c721024ce119c96e2fa357200b559b2f7dd5a5f02d5290aff74b03f3e471b273211c9721036d2b085e9e382ed10b69fc311a03f8641ccfff21574de0927513a49d9a688a0053aeffffffff0180603577000000001976a9147220c25031708a78712cbee318585135993fcf1a88ac00000000
+
+Raw signed transaction:
+02000000013a6156f5a215f93dc8a31d9682b02dc5dc2ee3258ba66e3af64f7070cb6aaad901000000fdfd0000483045022100e53cb5934eb54e3c3ca261f9d89083bf85d20dda8c99c0a516ab113e15503520022049f5f7de7a05fe24528802e5b6e9343dad0869eefdf11a0030fe3fb09b239a0001473044022043a5dce54f96068b9493ed71931606aa71e4fd9ce9778807043ee3d515de1db20220302378ef0570574988688a01f611d993032b5e3754a09fe70862df79eec4b191014c69522103a0434d9e47f3c86235477c7b1ae6ae5d3442d49b1943c2b752a68e2a47e247c721024ce119c96e2fa357200b559b2f7dd5a5f02d5290aff74b03f3e471b273211c9721036d2b085e9e382ed10b69fc311a03f8641ccfff21574de0927513a49d9a688a0053aeffffffff0180603577000000001976a9147220c25031708a78712cbee318585135993fcf1a88ac00000000
+
+TxId: 8f9be3b6c84a04e075588468a0c3aaca73197364aadd99937192244e71f393e5
+
+Sending transaction...
+
+PS G:\My Drive\DWS\Decentralized-Technologies\Assignment 1\temp>
+
